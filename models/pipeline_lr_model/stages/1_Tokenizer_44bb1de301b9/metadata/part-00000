@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.Tokenizer","timestamp":1732616696308,"sparkVersion":"3.5.1","uid":"Tokenizer_44bb1de301b9","paramMap":{"outputCol":"token_text","inputCol":"noi_dung_binh_luan_stopword"},"defaultParamMap":{"outputCol":"Tokenizer_44bb1de301b9__output"}}
