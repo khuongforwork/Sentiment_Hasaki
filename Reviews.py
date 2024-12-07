@@ -79,15 +79,12 @@ class Reviews:
 
 
     def visualize_sentiment(self):
-        # Kiểm tra nếu các cột cần thiết tồn tại
         if 'sentiment' not in self.data_processed.columns:
             print("Error: Column 'sentiment' is missing in the dataset.")
             return None
 
-        # Nhóm dữ liệu và đếm số lượng theo sentiment
         grouped_data = self.data_processed['sentiment'].value_counts()
 
-        # Vẽ biểu đồ và lấy Figure, Axes
         fig, ax = plt.subplots(figsize=(10, 6))
         grouped_data.plot(kind='bar', color='skyblue', ax=ax)
         ax.set_title("Số lượng theo Sentiment", fontsize=14)
@@ -97,5 +94,62 @@ class Reviews:
         ax.grid(axis='y', linestyle='--', alpha=0.7)
         plt.tight_layout()
 
-        # Trả về Figure hoặc Axes
-        return fig, ax
+        return fig
+
+
+    def visualize_time_group(self):
+        if 'gio_binh_luan' not in self.data_processed.columns or 'sentiment_label' not in self.data_processed.columns:
+            print("Error: Required columns are missing.")
+            return None
+        self.data_processed['gio_binh_luan'] = self.data_processed['gio_binh_luan'].str.split(':').str[0].astype(int)
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.histplot(data=self.data_processed, x='gio_binh_luan', hue='sentiment_label', stat='probability', ax=ax)
+        ax.set_title('Distribution of Sentiments Over Time')
+        ax.set_xlabel('Time of Day')
+        ax.set_ylabel('Probability')
+        plt.tight_layout()
+
+        return fig
+
+    def visualize_day_group(self):
+        if 'day_of_week' not in self.data_processed.columns or 'sentiment_label' not in self.data_processed.columns:
+            print("Error: Required columns are missing.")
+            return None
+
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.histplot(data=self.data_processed, x='day_of_week', hue='sentiment_label', stat='probability', ax=ax)
+        ax.set_title('Distribution of Sentiments by Day of the Week')
+        ax.set_xlabel('Day of the Week')
+        ax.set_ylabel('Probability')
+        plt.tight_layout()
+
+        return fig
+
+    def visualize_length(self):
+        if 'sentiment_label' not in self.data_processed.columns or 'noi_dung_binh_luan' not in self.data_processed.columns:
+            print("Error: Required columns are missing.")
+            return None
+
+        figure, (pos_ax, neg_ax) = plt.subplots(1, 2, figsize=(15, 8))
+
+        datachart = self.data_processed
+        # Positive Sentiment
+        pos_reviews = datachart[datachart['sentiment_label'] == 'positive']
+        pos_word = pos_reviews['noi_dung_binh_luan'].str.split().apply(lambda x: [len(i) for i in x])
+        sns.histplot(pos_word.map(lambda x: sum(x) / len(x)), ax=pos_ax, color='green')
+        pos_ax.set_title('Average Word Length in Positive Reviews')
+        pos_ax.set_xlabel('Average Word Length')
+        pos_ax.set_ylabel('Density')
+
+        # Negative Sentiment
+        neg_reviews = datachart[datachart['sentiment_label'] == 'negative']
+        neg_word = neg_reviews['noi_dung_binh_luan'].str.split().apply(lambda x: [len(i) for i in x])
+        sns.histplot(neg_word.map(lambda x: sum(x) / len(x)), ax=neg_ax, color='red')
+        neg_ax.set_title('Average Word Length in Negative Reviews')
+        neg_ax.set_xlabel('Average Word Length')
+        neg_ax.set_ylabel('Density')
+
+        figure.suptitle('Average Word Length in Reviews')
+        plt.tight_layout()
+
+        return figure
