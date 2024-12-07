@@ -1,5 +1,5 @@
-import findspark
-findspark.init()
+# import findspark
+# findspark.init()
 from pyspark.sql.functions import length, isnan, when, round, col, udf, lit, concat, asc, regexp_replace
 from functools import reduce
 import re
